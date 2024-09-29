@@ -16,19 +16,21 @@ def round_robin_scheduling(processes, quantum):
             if rem_burst_times[i] > 0:
                 process_executed = False
                 if rem_burst_times[i] > quantum:
-                    order.append((processes[i][0], quantum))
+                    #NOTE: do the change here to track the execution order
                     t += quantum
                     rem_burst_times[i] -= quantum
                     process_executed = True
                 else:
-                    order.append((processes[i][0], rem_burst_times[i]))
+                    #NOTE: do the change here to track the execution order
                     t += rem_burst_times[i]
                     waiting_time[i] = t - processes[i][1]
                     rem_burst_times[i] = 0
                     process_executed = True
 
                 if process_executed:
-                    print(f"Process {processes[i][0]} executed for {order[-1][1]} units.")
+                    #NOTE: do the required change here
+                    #NOTE: print a message "Process <process number> executed for <number of units> units"
+                    pass
 
     # Calculate turnaround time
     for i in range(n):
@@ -45,12 +47,12 @@ def round_robin_scheduling(processes, quantum):
     print(f"\nAverage Waiting Time: {avg_waiting}")
     print(f"Average Turnaround Time: {avg_turnaround}")
 
-    # Print execution order
+    # Print execution order and number of context switch
     print("\nExecution Order (Process ID, Time Units):")
-    for proc in order:
-        print(proc)
+    #NOTE do the required change here
 
 if __name__ == '__main__':
+    #NOTE do the required change here 
     # List of processes [process_id, burst_time]
     # Assuming same initial arrival time for all process
     processes = [[1, 10], [2, 1], [3, 2], [4, 1], [5, 5]]
