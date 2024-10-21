@@ -80,25 +80,21 @@ def editor_task(editor_id):
 
 def main():
     """Main function to initialize the simulation."""
-    # TODO 11: Start writer threads
     writer_threads = []
     for i in range(NUM_WRITERS):
         t = threading.Thread(target=writer_task, args=(i,))
         writer_threads.append(t)
         t.start()
 
-    # TODO 12: Start editor threads
     editor_threads = []
     for i in range(NUM_EDITORS):
         t = threading.Thread(target=editor_task, args=(i,))
         editor_threads.append(t)
         t.start()
 
-    # TODO 13: Ensure all writer threads finish
     for t in writer_threads:
         t.join()
 
-    # TODO 14: Ensure all editor threads finish
     for t in editor_threads:
         t.join()
 
