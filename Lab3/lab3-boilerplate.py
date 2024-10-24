@@ -58,7 +58,6 @@ def editor_task(editor_id):
 
         try:
             # TODO 5: Check if there are articles to review
-            # TODO 6: consider preventing possible deadlock here by using a timeout (search for it in the Python documentation) REM<OVE this one
             with print_lock:  # console is a shared resource, so we need to lock it
                 print(f"Editor {editor_id} is reviewing an article.")
             time.sleep(random.uniform(1, 3))  # Simulate review time
