@@ -7,7 +7,7 @@ PAGE_TABLE_LEVEL_1_SIZE = 4
 # Size of the second-level page table (number of entries per level-1 entry)
 PAGE_TABLE_LEVEL_2_SIZE = 4
 FRAME_SIZE = 256               # Frame size in bytes
-TLB_SIZE = 8                   # Number of entries in the TLB cache
+TLB_SIZE = 16                   # Number of entries in the TLB cache
 
 # Bit mask and shift values for extracting parts of the virtual address
 # Number of bits for Level 1 index (4 entries -> 2 bits)
@@ -37,41 +37,42 @@ def translate_address(virtual_address) -> tuple:
     Translate a virtual address to a physical address using a two-level page table and TLB.
     Returns a tuple with the physical address and a boolean indicating if it was a TLB hit.
     """
-    level_1_index = (virtual_address >> (
-        LEVEL_2_BITS + OFFSET_BITS)) & LEVEL_1_MASK
+    level_1_index = (virtual_address >> (LEVEL_2_BITS + OFFSET_BITS)) & LEVEL_1_MASK
+
     # TODO-1: Level 2 index, and Offset using bit manipulation. In the next two lines, replace the None values with the correct bit manipulation code
-    level_2_index = None  # Replace with the correct bit manipulation code
-    offset = None  # Replace with the correct bit manipulation code
+
+    level_2_index = (virtual_address >> OFFSET_BITS) & LEVEL_2_MASK
+    offset = virtual_address & OFFSET_MASK
 
     physical_address = None  # you don't need to change this line
     is_tlb_hit = False  # you don't need to change this line
 
     if (level_1_index, level_2_index) in tlb:
         # Placeholder for TLB hit logic
-        physical_frame = None   # TODO-2: Replace this line with TLB hit retrieval code
+        physical_frame = tlb[(level_1_index, level_2_index)]   # TODO-2: Replace this line with TLB hit retrieval code
 
         # Update TLB for LRU by moving accessed item to the end (you don't have to do anything here)
         tlb.move_to_end((level_1_index, level_2_index))
         print(f"TLB hit for virtual page ({level_1_index}, {level_2_index}).")
 
         # TODO-2.1: Calculate the physical address in the next line using the frame number and offset
-        physical_address = None
-        is_tlb_hit = None  # TODO-2.2: Set the is_tlb_hit flag
+        physical_address == (physical_frame << OFFSET_BITS) or offset
+        is_tlb_hit = True  # TODO-2.2: Set the is_tlb_hit flag
 
     elif level_1_index in page_table and level_2_index in page_table[level_1_index]:
         # TODO-3: TLB miss. Update next line to retrieve the frame from the two-level page table
-        physical_frame = None  # Replace with page table retrieval code
+        physical_frame = page_table[level_1_index][level_2_index]  # Replace with page table retrieval code
         tlb[(level_1_index, level_2_index)] = physical_frame
         print(f"TLB miss. Retrieved from page table for virtual page ({
               level_1_index}, {level_2_index}).")
 
         if len(tlb) > TLB_SIZE:
-            evicted_page = None  # TODO-4: If TLB is full, evict the least recently used entry
+            evicted_page = tlb.popitem(last=False)  # TODO-4: If TLB is full, evict the least recently used entry
             print(f"Evicted page {evicted_page} from TLB (LRU policy).")
 
         # TODO-4.1: Using physical_frame obtained in TODO-3, in the next line, calculate the physical address using the frame number and offset
-        physical_address = None
-        is_tlb_hit = None  # TODO-4.2: Set the is_tlb_hit flag
+        physical_address = (physical_frame << OFFSET_BITS) or offset
+        is_tlb_hit = False  # TODO-4.2: Set the is_tlb_hit flag
     else:
         # Page fault (not in the page table)
         print(f"Page fault! Virtual page ({level_1_index}, {
@@ -97,7 +98,12 @@ def simulate_address_access(access_pattern):
     print(f"Total Accesses: {len(access_pattern)}")
     print(f"TLB Hits: {tlb_hits}")
     print(f"TLB Misses: {tlb_misses}")
-    hit_rate = float('NaN')  # TODO-5: Calculate and print the TLB hit rate
+
+    if len(access_pattern) > 0:
+
+        hit_rate = float((tlb_hits / len(access_pattern)) * 100)  # TODO-5: Calculate and print the TLB hit rate
+    else: 0
+    
     print(f"TLB Hit Rate: {hit_rate:.2f}%")
 
 # Main function to run multiple test cases with different access patterns
